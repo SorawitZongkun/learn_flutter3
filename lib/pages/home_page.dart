@@ -1,4 +1,5 @@
 // Step 2: make a home page
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:learn_flutter4/services/firestore.dart';
 
@@ -51,6 +52,52 @@ class _HomePageState extends State<HomePage> {
           openNoteBox();
         },
         child: Icon(Icons.add),
+      ),
+      // Step 4: make a read function
+      body: StreamBuilder<QuerySnapshot>(
+        stream: firestoreService.getNotesStream(),
+        builder: (context, snapshot) {
+          // if we have data, get all the documents
+          if (snapshot.hasData) {
+            List notesList = snapshot.data!.docs;
+
+            // display the notes
+            return ListView.builder(
+              itemCount: notesList.length,
+              itemBuilder: (context, index) {
+                // get each indifidual note
+                DocumentSnapshot document = notesList[index];
+                String docId = document.id;
+
+                // get note from each document
+                Map<String, dynamic> data =
+                    document.data() as Map<String, dynamic>;
+                String noteText = data['note'];
+
+                // display as a list tile
+                return ListTile(
+                  title: Text(noteText),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      // delete the note
+                      firestoreService.notes.doc(docId).delete();
+                    },
+                  ),
+                );
+              },
+            );
+          }
+          // if we don't have data, return nothing
+          else {
+            return Center(
+              child: Text(
+                "No notes available",
+                style: TextStyle(fontSize: 20, color: Colors.redAccent),
+              ),
+            );
+          }
+        },
       ),
     );
   }
