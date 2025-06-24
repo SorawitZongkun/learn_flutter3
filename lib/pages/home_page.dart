@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController textController = TextEditingController();
 
   // open a dialog vox to add a note
-  void openNoteBox({String? docId}) {
+  void openNoteBox({String? docID}) {
     showDialog(
       context: context,
       builder:
@@ -31,9 +31,9 @@ class _HomePageState extends State<HomePage> {
                   // firestoreService.addNote(textController.text);
 
                   // Step 5: make an update function
-                  if (docId != null) {
+                  if (docID != null) {
                     // update the note
-                    firestoreService.updateNote(docId, textController.text);
+                    firestoreService.updateNote(docID, textController.text);
                   } else {
                     // add a new note
                     firestoreService.addNote(textController.text);
@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) {
                 // get each indifidual note
                 DocumentSnapshot document = notesList[index];
-                String docId = document.id;
+                String docID = document.id;
 
                 // get note from each document
                 Map<String, dynamic> data =
@@ -86,16 +86,24 @@ class _HomePageState extends State<HomePage> {
                 // display as a list tile
                 return ListTile(
                   title: Text(noteText),
-                  trailing: IconButton(
-                    // icon: Icon(Icons.delete),
-                    icon: Icon(Icons.settings),
-                    onPressed: () {
-                      // delete the note
-                      // firestoreService.notes.doc(docId).delete();
-
-                      // Step 5: make an update function
-                      openNoteBox(docId: docId);
-                    },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.settings),
+                        onPressed: () {
+                          // Step 5: make an update function
+                          openNoteBox(docID: docID);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          // Step 6: make a delete function
+                          firestoreService.deleteNote(docID);
+                        },
+                      ),
+                    ],
                   ),
                 );
               },
